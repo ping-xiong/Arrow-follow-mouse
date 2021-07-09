@@ -24,11 +24,16 @@ $(function() {
 
     imgObj.src = "./arrow.png"
     imgObj.onload = function () {
+
+        drawPic(false, false)
+
         $(document).mousemove(function(e){
             // console.log(e.pageX + ", " + e.pageY)
             drawPic(e.pageX, e.pageY)
         });
     }
+
+    console.log('Blog: https://pingxonline.com/')
 })
 
 //窗口尺寸改变响应（修改canvas大小）
@@ -51,14 +56,17 @@ function drawPic(mouse_x, mouse_y){
     while (start_y < window_height - gap){
 
         while (start_x < window_width - gap){
+            if (!mouse_x){
+                ctx.drawImage(imgObj, start_x, start_y)
+            }else{
+                const angle = getAngle(mouse_x, mouse_y, start_x + img_width / 2, start_y + img_width / 2)
 
-            const angle = getAngle(mouse_x, mouse_y, start_x + img_width / 2, start_y + img_width / 2);
-
-            ctx.save()
-            ctx.translate(start_x + img_width / 2,  start_y + img_width / 2)
-            ctx.rotate(angle * Math.PI / 180)
-            ctx.drawImage(imgObj, -img_width/2, -img_height/2, img_width, img_height)
-            ctx.restore()
+                ctx.save()
+                ctx.translate(start_x + img_width / 2,  start_y + img_width / 2)
+                ctx.rotate(angle * Math.PI / 180)
+                ctx.drawImage(imgObj, -img_width/2, -img_height/2, img_width, img_height)
+                ctx.restore()
+            }
             start_x += gap + img_width
         }
 
@@ -68,11 +76,6 @@ function drawPic(mouse_x, mouse_y){
 
 }
 
-/**
- * 获得角度
- */
 function getAngle(x1, y1, x2, y2) {
-    var degree = Math.atan2( y2 - y1 ,x1 - x2) / (Math.PI / 180);
-    console.log(-degree)
-    return -degree + 90;
+    return -(Math.atan2( y2 - y1 ,x1 - x2) / (Math.PI / 180)) + 90
 }
