@@ -8,11 +8,42 @@ var img_height = 32
 var img_width = 20
 
 // 间隙
-var gap = 15
+var gap = 20
 
 // 窗口大小
 var window_height = 0
 var window_width = 0
+
+var padding = 10
+
+var background = "#ffffff"
+
+var lastMouseX = 0
+var lastMouseY = 0
+
+window.wallpaperPropertyListener = {
+    applyUserProperties: function(properties) {
+        if (properties.padding) {
+            padding = properties.padding.value
+            $('html').get(0).style.padding = padding + 'px'
+            resizeCanvas()
+            drawPic(lastMouseX, lastMouseY, false)
+        }
+        if (properties.gap) {
+            gap = properties.gap.value
+            drawPic(lastMouseX, lastMouseY, false)
+        }
+        if (properties.background) {
+            var customColor = properties.background.value.split(' ');
+            customColor = customColor.map(function(c) {
+                return Math.ceil(c * 255);
+            });
+            background =  'rgb(' + customColor + ')';
+            $('html').get(0).style.background = background
+        }
+    },
+};
+
 
 $(function() {
     canvas = $('#myCanvas')
@@ -22,14 +53,18 @@ $(function() {
     //页面加载后先设置一下canvas大小
     resizeCanvas();
 
+    $('html').get(0).style.padding = padding + 'px'
+    $('html').get(0).style.background = background
+
     imgObj.src = "./arrow.png"
     imgObj.onload = function () {
 
-        drawPic(false, false)
+        drawPic(0, 0, true)
 
         $(document).mousemove(function(e){
-            // console.log(e.pageX + ", " + e.pageY)
-            drawPic(e.pageX, e.pageY)
+            lastMouseX = e.pageX - padding
+            lastMouseY = e.pageY - padding
+            drawPic(lastMouseX, lastMouseY, false)
         });
     }
 
@@ -38,14 +73,14 @@ $(function() {
 
 //窗口尺寸改变响应（修改canvas大小）
 function resizeCanvas() {
-    window_height = $(window).get(0).innerHeight
-    window_width = $(window).get(0).innerWidth
+    window_height = $(window).get(0).innerHeight - (padding * 2)
+    window_width = $(window).get(0).innerWidth - (padding * 2)
     canvas.attr("width", window_width)
     canvas.attr("height", window_height)
 }
 
 // 绘制
-function drawPic(mouse_x, mouse_y){
+function drawPic(mouse_x, mouse_y, firstInit){
 
     // canvas.attr("width", window_width)
     canvas.attr("height", window_height)
@@ -56,7 +91,7 @@ function drawPic(mouse_x, mouse_y){
     while (start_y < window_height - gap){
 
         while (start_x < window_width - gap){
-            if (!mouse_x){
+            if (firstInit){
                 ctx.drawImage(imgObj, start_x, start_y)
             }else{
                 const angle = getAngle(mouse_x, mouse_y, start_x + img_width / 2, start_y + img_width / 2)
