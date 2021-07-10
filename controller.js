@@ -49,6 +49,8 @@ window.wallpaperPropertyListener = {
                 $('html').get(0).style.backgroundImage = "url('" + bg + "')"
                 $('html').get(0).style.backgroundSize = "cover"
                 $('html').get(0).style.backgroundPosition = "center"
+            }else{
+                $('html').get(0).style.backgroundColor = background
             }
         }
         if(properties.ui_angle){
